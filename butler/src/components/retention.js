@@ -19,7 +19,6 @@ export default class Retention extends React.Component{
     componentDidMount(){//组件挂载完成可以向后台发送请求获得数据
       console.log("组件挂载完成")
      }
-    
      render(){
       	return(
      	 		<div>
