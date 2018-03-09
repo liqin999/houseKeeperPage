@@ -1,3 +1,4 @@
+/*产品使用率*/
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {
@@ -15,6 +16,9 @@ export default class Userate extends React.Component{
            
 	    }
    
+     }
+    componentDidMount(){
+      console.log("组件挂载完成")
      }
      componentWillReceiveProps(){
      
