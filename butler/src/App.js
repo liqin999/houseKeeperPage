@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import 'antd/dist/antd.css';
+import Retention from './components/retention.js';
+import Members from './components/members.js';
+import Renewal from './components/renewal.js';
+import Userate from './components/userate.js';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  HashRouter 
+} from 'react-router-dom';
 class App extends Component {
+  constructor(props){
+    super(props);
+    this.state={}
+  }
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div>
+          <Route exact path="/retention" component={Retention}/>
+          <Route exact path="/members" component={Members}/>
+          <Route exact path="/renewal" component={Renewal}/>
+          <Route exact path="/userate" component={Userate}/>
       </div>
     );
   }
