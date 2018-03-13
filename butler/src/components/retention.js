@@ -11,7 +11,7 @@ import {
 } from 'react-router-dom';
 import axios from 'axios';
 import {getDomain,mockData} from '../common/config/interface';
-import { Row, Col , Select ,Table} from 'antd';
+import { Row, Col , Select ,Table,Button ,Icon } from 'antd';
 var echarts = require('echarts');
 
 const Option = Select.Option;
@@ -37,9 +37,9 @@ export default class Retention extends React.Component{
         mainCharts:this.refs.mainCharts
       },function(){//在setState的回调的函数里面写具体的请求数据
         var myChart = echarts.init(this.state.mainCharts);
-        let  rentionOption = {
+ let rentionOption = {//进行异步的请求数据形式
     title: {
-        text: '管家客户数量'
+        text: ''
     },
     tooltip: {
         trigger: 'axis'
@@ -145,10 +145,8 @@ export default class Retention extends React.Component{
 
     ]
    };
- myChart.setOption(rentionOption);
-
-              
-      })
+    myChart.setOption(rentionOption);
+ })
  }
 
     componentWillReceiveProps(nextProps){
@@ -306,6 +304,164 @@ export default class Retention extends React.Component{
 
         //图标插件显示
         // 使用刚指定的配置项和数据显示图表。
+
+        //区域数据 region 使用表格的嵌套的形式  使用表格的嵌套 
+        //月份英文：January Feburary March April May June July August 
+        // September October November December
+        const regionColumns = [
+          {
+            dataIndex: 'name',
+            title: '月份(保有/新增/流失)',
+            width:150
+          }, 
+          {
+            title: '1月',
+            dataIndex: 'January',
+          }, 
+          {
+              title: '2月',
+              dataIndex: 'Feburary',
+             
+          }, 
+          {
+            title: '3月',
+            dataIndex: 'March',
+            
+          }, 
+          {
+            title: '4月',
+            dataIndex: 'April',
+            
+          }, 
+          {
+            title: '5月',
+            dataIndex: 'May',
+            
+          }, 
+          {
+            title: '6月',
+            dataIndex: 'June',
+           
+          }, 
+          {
+            title: '7月',
+            dataIndex: 'July',
+            
+          }, 
+          {
+            title: '8月',
+            dataIndex: 'August',
+            
+          }, 
+          {
+            title: '9月',
+            dataIndex: 'September',
+            
+          }, 
+          {
+            title: '10月',
+            dataIndex: 'October',
+           
+          }, 
+          {
+            title: '11月',
+            dataIndex: 'November',
+          
+          }, 
+          {
+            title: '12月',
+            dataIndex: 'December',
+          }
+          ];
+
+         const regionData = [
+          {
+              key: 1,
+              name: "总计",
+              January: "32/12/56",
+              Feburary:"32/12/56" ,
+              March: "32/12/56",
+              April: "32/12/56",
+              May: "32/12/56",
+              June:"32/12/56" ,
+              July:"32/12/56" ,
+              August:"32/12/56",
+              September: "32/12/56",
+              October: "32/12/56",
+              November: "32/12/56",
+              December:"32/12/56"
+          },
+
+          {
+               key: 2,
+              name: "京津石",
+              January: "32/12/56",
+              Feburary:"32/12/56" ,
+              March: "32/12/56",
+              April: "32/12/56",
+              May: "32/12/56",
+              June:"32/12/56" ,
+              July:"32/12/56" ,
+              August:"32/12/56",
+              September: "32/12/56",
+              October: "32/12/56",
+              November: "32/12/56",
+              December:"32/12/56"
+          },
+          {
+               key: 3,
+              name: "山东区",
+              January: "32/12/56",
+              Feburary:"32/12/56" ,
+              March: "32/12/56",
+              April: "32/12/56",
+              May: "32/12/56",
+              June:"32/12/56" ,
+              July:"32/12/56" ,
+              August:"32/12/56",
+              September: "32/12/56",
+              October: "32/12/56",
+              November: "32/12/56",
+              December:"32/12/56"
+          },
+          {
+             key: 4,
+              name: "河南区",
+              January: "32/12/56",
+              Feburary:"32/12/56" ,
+              March: "32/12/56",
+              April: "32/12/56",
+              May: "32/12/56",
+              June:"32/12/56" ,
+              July:"32/12/56" ,
+              August:"32/12/56",
+              September: "32/12/56",
+              October: "32/12/56",
+              November: "32/12/56",
+              December:"32/12/56"
+          },
+          {
+              key: 5,
+              name: "河北区",
+              January: "32/12/56",
+              Feburary:"32/12/56" ,
+              March: "32/12/56",
+              April: "32/12/56",
+              May: "32/12/56",
+              June:"32/12/56" ,
+              July:"32/12/56" ,
+              August:"32/12/56",
+              September: "32/12/56",
+              October: "32/12/56",
+              November: "32/12/56",
+              December:"32/12/56"
+          }
+         ];
+
+        //分司数据 division
+
+        //管家数据 manager
+
  
       	return(
           <div>
@@ -380,7 +536,25 @@ export default class Retention extends React.Component{
                   <h2 style={{textAlign: "center"}}>客户保有量</h2>
                    <div id="mainCharts" ref="mainCharts" style={{width: 1000,height:400}}></div> 
                 </div>
-  
+                
+                <hr />
+
+                 <h2 
+                 style={{"textAlign":"left"}}>
+                 区域数据报表:
+                  <Button 
+                  type="primary" 
+                  style={{"backgroundColor":"#65707b","margin-left":"10px","border-color":"#65707b"}}
+                  icon="download" loading={this.state.iconLoading} onClick={this.enterIconLoading}>
+          下载</Button>
+          </h2>
+
+                     <Table 
+                    columns={regionColumns} 
+                    dataSource={regionData}
+                    pagination={{ pageSize: 2 }} 
+                    scroll={{ y: 240 }} />
+
           </div>
          
              
