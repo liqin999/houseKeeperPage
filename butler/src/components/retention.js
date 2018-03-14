@@ -1,4 +1,6 @@
-/*客户保有量*/
+/* 客户保有量 本页面是顶部导航是一个请求，
+ * 然后触发导航里面的搜索按钮请求另外的参数进行查询得到页面数据
+*/
 /*require("./retention.css")*/
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -13,22 +15,33 @@ import axios from 'axios';
 import {getDomain,mockData} from '../common/config/interface';
 import { Row, Col , Select ,Table,Button ,Icon } from 'antd';
 var echarts = require('echarts');
-
 const Option = Select.Option;
 require("./retention.css");
 export default class Retention extends React.Component{
 	constructor(props) {
 	    super(props);
-	    this.state={
+	    this.state={//将从后台取道的数据变成组建自己的状态
          AccessRight:null,//操作权限
          mainCharts:null,//图表容器
-         retentionData:{},//后台返回的数据形式
+         year:"",//向后台传递查询参数
+         area:"",
+         company:"",
+         person:"",
+         retentionData:{//后台返回的数据
+          'year':[],//年份
+          'area':[],//区域
+          'company':[],//分司
+          'person':[],//管家
+
+         },//后台返回的数据形式
 
 	    };
+      this.handleChangeValue = this.handleChangeValue.bind(this);
       this.handleChangeYear = this.handleChangeYear.bind(this);
       this.handleChangeArea = this.handleChangeArea.bind(this);
       this.handleChangeCompany = this.handleChangeCompany.bind(this);
       this.handleChangePerson = this.handleChangePerson.bind(this);
+      this.handleSearchData = this.handleSearchData.bind(this);
      }
      //生命周期钩子函数
     componentDidMount(){//组件挂载完成可以向后台发送请求获得数据
@@ -174,24 +187,87 @@ export default class Retention extends React.Component{
       });
     }
 
-    handleChangeYear(value){
-        console.log(value)
+    handleChangeYear(value){//年份的改变
+        console.log(value);
+        this.state({
+          year:value
+        }) 
+
+    }
+    handleSearchData(){//点击搜索按钮最终的条件的渲染数据
+        let postSelectArg = {
+          year:this.state.year,
+          area:this.state.area,
+          company:this.state.company,
+          person:this.state.person
+        };
+        let that = this;
+
+        let searchDataUrl=mockData.searchDataUrl;
+
+        axios.post(searchDataUrl,postSelectArg)
+        .then(function (response) {
+          that.setState({
+            retentionData:response.data
+          })
+        })
+        .catch(function (error) {
+          console.log(error);
+       });
+
+
+    }
+    handleChangeValue(value,str){//处理区域，分公司，管家名字
+      //像后台发送不同的值，请求不同的数据
+      let that = this;
+      let selecturl = mockData.getRetentionSelect;
+      axios.post(selecturl, {
+          value: value,//下拉的值
+          str: str//辨别是哪一项下拉
+        })
+        .then(function (response) {
+          that.setState({
+            retentionData:{//直接全部的对象进行赋值操作
+              "area":response.area,
+              "company":response.company,
+              "person":response.person,
+             },
+          })
+          console.log(response);
+
+        })
+        .catch(function (error) {
+          console.log(error);
+       });
+
     }
     handleChangeArea(value){
-        console.log(value)
+      this.setState({
+        area:value
+      });
+       
+        this.handleChangeValue(value,'area');
     }
     handleChangeCompany(value){
+      this.setState({
+        company:value
+      })
         console.log(value)
+        this.handleChangeValue(value,'company');
     }
     handleChangePerson(value){
+      this.setState({
+        person:value
+      })
         console.log(value)
+        this.handleChangeValue(value,'person');
     }
      render(){
       let retentionData = this.state;
       //console.log(document.getElementById('mainCharts'))
      
       //jsx的赋值的形式 在大括号中写值
-      let {handleChangeYear,handleChangeArea,handleChangeCompany,handleChangePerson}=this;
+      let {handleChangeYear,handleChangeArea,handleChangeCompany,handleChangePerson,handleSearchData}=this;
       const columns = [{
           title: '月份',
           dataIndex: 'month',
@@ -391,7 +467,6 @@ export default class Retention extends React.Component{
               November: "32/12/56",
               December:"32/12/56"
           },
-
           {
                key: 2,
               name: "京津石",
@@ -492,7 +567,13 @@ export default class Retention extends React.Component{
                       <Select defaultValue="李钦" style={{ width: 120,marginRight:30 }} onChange={handleChangePerson}>
                         <Option value="张三">张三</Option>
                         <Option value="李钦">李钦</Option>
-                    </Select>
+                       </Select>
+                       <Button
+                       type="primary" 
+                       icon="search"
+                       onClick={handleSearchData}
+                       >搜索
+                       </Button>
                 </Col>
              </Row>
              <hr />
@@ -544,7 +625,7 @@ export default class Retention extends React.Component{
                  区域数据报表:
                   <Button 
                   type="primary" 
-                  style={{"backgroundColor":"#65707b","margin-left":"10px","border-color":"#65707b"}}
+                  style={{"backgroundColor":"#65707b","marginLeft":"10px","borderColor":"#65707b"}}
                   icon="download" loading={this.state.iconLoading} onClick={this.enterIconLoading}>
           下载</Button>
           </h2>

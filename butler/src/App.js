@@ -22,7 +22,7 @@ class App extends Component {
     }
   }
   componentDidMount(){
-    console.log("APP组件挂载完成");
+    console.log("APP组件挂载完成.");
     //向后台发送请求，判断是总部，管家，分公司
     let getRight = mockData.getRight;
     let that = this;
@@ -36,7 +36,6 @@ class App extends Component {
     .catch(function (error) {
       console.log(error);
     });
-    
   }
   render() {
     let {AccessRight} = this.state;//对象的结构赋值
