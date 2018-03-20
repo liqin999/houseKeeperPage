@@ -2,7 +2,8 @@ const environment = {
     devHttp:"http://ca-web.yun300.cn",
     testHttp:'http://data.yun300.cn',
     conHttp:'http://webapp.data.yun300.cn',
-    default:"http://ca-web.yun300.cn"
+    //default:"http://ca-web.yun300.cn",
+    default:"http://webapp.data.yun300.cn",
 };
 //判断接口环境
 function getDomain(){

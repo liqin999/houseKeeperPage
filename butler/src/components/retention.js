@@ -14,7 +14,9 @@ import {
 } from 'react-router-dom';
 import axios from 'axios';
 import {getDomain,mockData} from '../common/config/interface';
-import { Row, Col , Select ,Table,Button ,Icon } from 'antd';
+import { Row, Col , Select ,Table,Button ,Icon ,DatePicker} from 'antd';
+
+const MonthPicker = DatePicker.MonthPicker;
 var echarts = require('echarts');
 const Option = Select.Option;
 require("./retention.css");
@@ -36,117 +38,6 @@ export default class Retention extends React.Component{
           'person':[{0:"张三"},{1:"李四"},{2:"赵六"}],//管家
 
            //第二部分的统计数据
-
-           //第三部分的数据展示
-           'thirdColumns' : [{
-              title: '月份',
-              dataIndex: 'month',
-              key: 'month'
-            }, {
-              title: '1月',
-              dataIndex: 'January',
-              key: 'January',
-            }, {
-              title: '2月',
-              dataIndex: 'February',
-              key: 'February',
-            },
-            {
-              title: '3月',
-              dataIndex: 'March',
-              key: 'March',
-            }, {
-              title: '4月',
-              dataIndex: 'April',
-              key: 'April',
-            }, {
-              title: '5月',
-              dataIndex: 'May',
-              key: 'May',
-            },
-            {
-              title: '6月',
-              dataIndex: 'June',
-              key: 'June',
-            }, {
-              title: '7月',
-              dataIndex: 'July',
-              key: 'July',
-            }, {
-              title: '8月',
-              dataIndex: 'August',
-              key: 'August',
-            },
-            {
-              title: '9月',
-              dataIndex: 'September',
-              key: 'September',
-            }, {
-              title: '10月',
-              dataIndex: 'October',
-              key: 'October',
-            }, {
-              title: '11月',
-              dataIndex: 'November',
-              key: 'November',
-            },
-            {
-              title: '12月',
-              dataIndex: 'December',
-              key: 'December',
-            }],
-
-          'thirdData' : [
-              {
-                key: '1',
-                month: '保有',
-                January :1,
-                February : 2,
-                April:3,
-                March:4,
-                May:5,
-                June:6,
-                July:7,
-                August:8,
-                September:9, 
-                October: 10,
-                November:11,
-                December:12
-                
-              }, 
-              {
-                key: '2',
-                month: '新增',
-                January :1,
-                February : 2,
-                April:3,
-                March:4,
-                May:5,
-                June:6,
-                July:7,
-                August:8,
-                September:9, 
-                October: 10,
-                November:11,
-                December:12
-              }, 
-              {
-                key: '3',
-                month: '流失',
-                January :1,
-                February : 2,
-                April:3,
-                March:4,
-                May:5,
-                June:6,
-                July:7,
-                August:8,
-                September:9, 
-                October: 10,
-                November:11,
-                December:12
-              }
-              ],
 
            //第四部分图标数据
           'rentionChartOption' : {//进行异步的请求数据形式
@@ -342,7 +233,7 @@ export default class Retention extends React.Component{
               December:"32/12/56"
           },
           {
-               key: 2,
+              key: 2,
               name: "京津石",
               January: "32/12/56",
               Feburary:"32/12/56" ,
@@ -446,7 +337,7 @@ export default class Retention extends React.Component{
       })
       .then(function (response) {
          that.setState({
-            retentionData : response.data
+            //retentionData : response.data
          })
       })
       .catch(function (error) {
@@ -475,7 +366,7 @@ export default class Retention extends React.Component{
         axios.post(searchDataUrl,postSelectArg)
         .then(function (response) {
           that.setState({
-            retentionData:response.data
+            //retentionData:response.data
           })
         })
         .catch(function (error) {
@@ -496,10 +387,11 @@ export default class Retention extends React.Component{
         .then(function (response) {
           that.setState({
             retentionData:{//直接全部的对象进行赋值操作
-              "area":response.area,
-              "company":response.company,
-              "person":response.person,
+              //"area":response.area,
+              // "company":response.company,
+              // "person":response.person,
              },
+             
           })
           console.log(response);
 
@@ -533,7 +425,10 @@ export default class Retention extends React.Component{
      render(){
       let retentionData = this.state;
       let {handleChangeYear,handleChangeArea,handleChangeCompany,handleChangePerson,handleSearchData}=this;
-      let {area,company,person} = this.state.retentionData;
+      let area = this.state.retentionData.area;
+      let company = this.state.retentionData.company;
+      let person = this.state.retentionData.person;
+      
       let areaOptions = area.map((item,index )=>{
             return <Option key={Object.keys(item)[0]} value={Object.values(item)[0]}>{Object.values(item)[0]}</Option>
         });
@@ -543,18 +438,28 @@ export default class Retention extends React.Component{
         });
 
         let personOptions = person.map((item,index )=>{
-               return <Option key={Object.keys(item)[0]} value={Object.values(item)[0]}>{Object.values(item)[0]}</Option>
+              return <Option key={Object.keys(item)[0]} value={Object.values(item)[0]}>{Object.values(item)[0]}</Option>
         });
+        let date=new Date;  
+        let currentyear=date.getFullYear(); 
+        let yearRange = [];
+       
+        for(var i = currentyear; i > currentyear-5;i--){
+          yearRange.push(i)
+        }
+       
+        let yearOptions = yearRange.map((item,index )=>{
+               return <Option key={item} value={item}>{item}</Option>
+        });
+
       	return(
           <div>
              <Row>
                 <Col span="24">
                       <span style={{marginRight:5}}>年度:</span>
                       <Select defaultValue="2018" style={{ width: 120,marginRight:30 }} onChange={handleChangeYear}>
-                        <Option value="2016">2016</Option>
-                        <Option value="2017">2017</Option>
-                        <Option value="2018">2018</Option>
-                        <Option value="2019">2019</Option>
+                        {yearOptions}
+                        
                       </Select>
                    
                       <span style={{marginRight:5}}>区域:</span>
@@ -613,8 +518,6 @@ export default class Retention extends React.Component{
                       <span>北京2</span>
                   </Col>
                </Row>
-               
-                <Table style={{marginTop:20}} columns={this.state.retentionData.thirdColumns} dataSource={this.state.retentionData.thirdData} pagination={false} />
                 
                 <div style={{marginTop:20}}>
                   <h2 style={{textAlign: "center"}}>客户保有量</h2>
