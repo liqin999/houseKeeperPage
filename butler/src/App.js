@@ -18,32 +18,40 @@ class App extends Component {
     super(props);
     this.state={
       //0 所有  1总部  2管家  3个人
-       AccessRight:"0",
-       allPageData:null,//各个组件中的初始化的数据
+       'AccessRight':"0",
+       'allPageData':null,//各个组件中的初始化的数据
+       'a':0
+
     }
   }
   componentDidMount(){
-    console.log("APP组件挂载完成.");
+    
     //向后台发送请求，判断是总部，管家，分公司
     let getRight = getDomain()+'/customization/inventory/init';
+    let initUrl = "/bi-customization/inventory/init";
+
+    let mockInit = "https://www.easy-mock.com/mock/5aa8cb6eed660354c14569c0/getData_copy/initData";
+
     let that = this;
     axios.get(getRight,{
-      //areaId=75&subId=169&perId=14988&pageType=baoyou&year=2017-01
       params: {
          areaId:75,//区域ID
          subId:169,//分司ID
          perId:14988,//个人ID
-         pageType:'baoyou',//Tab类型
+         pageType:'baoyou',//Tab类型 是前端定的 根据类型确定（保有，会员，续费...）
          year:'2017-01'//查询时间
       }
     })
     .then(function (response) {//获得权限的内容
       let AccessRight =  response.data.data.security.state;
       let allPageData =  response.data.data;
-      that.setState({
-          AccessRight,
-          allPageData
-      })
+
+       that.setState(prevState => ({
+           AccessRight,
+           allPageData
+        }));
+
+    
     })
     .catch(function (error) {
       console.log(error);

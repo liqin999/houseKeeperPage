@@ -30,14 +30,29 @@ export default class Retention extends React.Component{
          area:"",
          company:"",
          person:"",
+
          retentionData:{//后台返回的数据  将数据进行整理，写成模拟的ajax形式
           //第一部分的下拉数据
           'year':[],//年份
-          'area':[{0:"河南"},{1:"江苏"},{2:"山东"}],//区域
-          'company':[{0:"郑州"},{1:"南京"},{2:"济南"}],//分司
-          'person':[{0:"张三"},{1:"李四"},{2:"赵六"}],//管家
+          'area':[{0:"请选择"}],//区域
+          'company':[{0:"请选择"}],//分司
+          'person':[{0:"请选择"}],//管家
 
            //第二部分的统计数据
+            "maxAndMin": {
+                "rentention": {
+                  "max": "",
+                  "Min": ""
+                },
+                "increase": {
+                  "max": "",
+                  "Min": ""
+                },
+                "decrease": {
+                  "max": "",
+                  "Min": ""
+                }
+            },
 
            //第四部分图标数据
           'rentionChartOption' : {//进行异步的请求数据形式
@@ -320,29 +335,28 @@ export default class Retention extends React.Component{
      })
     }
 
+    componentDidUpdate(){//组件更新完成之后
+
+    }
+
     componentWillReceiveProps(nextProps){
-      let that = this;
-      let AccessRight = this.props.AccessRight;//变成内部的状态
-      this.setState({
-           AccessRight
-      });
-      //向后台请求数据然后渲染到页面中,初始化。
-      let params = {
-          AccessRight1:nextProps.AccessRight  
-      };
-      axios({
-        method: 'post',
-        url: mockData.getRetentionData,
-        data: params
-      })
-      .then(function (response) {
-         that.setState({
-            //retentionData : response.data
-         })
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+      //AccessRight,props,allPageData
+      console.log(this.props.AccessRight);
+      console.log(this.props.allPageData);
+   
+     
+      let AccessRight = nextProps.AccessRight;//变成内部的状态
+      let retentionData = nextProps.allPageData;
+
+
+        this.setState(prevState => ({
+           AccessRight,
+           retentionData,
+        }));
+
+
+  
+     
     }
 
     handleChangeYear(value){//年份的改变
@@ -375,22 +389,41 @@ export default class Retention extends React.Component{
 
 
     }
-    handleChangeValue(value,str){//处理区域，分公司，管家名字
+    handleChangeValue(value,str,id){//处理区域，分公司，管家名字
       console.log(value,str)
       //像后台发送不同的值，请求不同的数据
       let that = this;
+      let textSelUrl = "/bi-customization/dim/findDim";
       let selecturl = mockData.getRetentionSelect;
-      axios.post(selecturl, {
-          value: value,//下拉的值
-          str: str//辨别是哪一项下拉
-        })
+      axios.get(textSelUrl, {
+          params: {
+           id: id,//下拉的id
+           type: str//辨别是哪一项下拉
+        }
+         })
         .then(function (response) {
           that.setState({
             retentionData:{//直接全部的对象进行赋值操作
-              //"area":response.area,
-              // "company":response.company,
-              // "person":response.person,
-             },
+              "area":[{0:"河南"}],
+              "company":response.data.select,
+              "person":[{0:"李钦"}],
+              "maxAndMin": {
+                "rentention": {
+                  "max": "",
+                  "Min": ""
+                },
+                "increase": {
+                  "max": "",
+                  "Min": ""
+                },
+                "decrease": {
+                  "max": "",
+                  "Min": ""
+                }
+            },
+
+            }
+            // retentionData['company'] = response.data.select;
              
           })
           console.log(response);
@@ -401,36 +434,45 @@ export default class Retention extends React.Component{
        });
 
     }
-    handleChangeArea(value){
+    handleChangeArea(value,obj){
       this.setState({
         area:value
       });
-       
-        this.handleChangeValue(value,'area');
+
+      
+      let id = obj.props.id;
+      this.handleChangeValue(value,'area',id);
     }
-    handleChangeCompany(value){
+    handleChangeCompany(value,obj){
       this.setState({
         company:value
       })
-        console.log(value)
-        this.handleChangeValue(value,'company');
+        let id = obj.props.id;
+        this.handleChangeValue(value,'company',id);
     }
-    handleChangePerson(value){
+    handleChangePerson(value,obj){
       this.setState({
         person:value
       })
         console.log(value)
-        this.handleChangeValue(value,'person');
+        let id = obj.props.id;
+        this.handleChangeValue(value,'person',id);
     }
      render(){
-      let retentionData = this.state;
+      let retentionData = this.state.regionData;
+
+      
+      let maxAndMin = this.state.retentionData.maxAndMin;//对象的结构赋值
+      console.log(this.state)
+
       let {handleChangeYear,handleChangeArea,handleChangeCompany,handleChangePerson,handleSearchData}=this;
       let area = this.state.retentionData.area;
       let company = this.state.retentionData.company;
       let person = this.state.retentionData.person;
       
       let areaOptions = area.map((item,index )=>{
-            return <Option key={Object.keys(item)[0]} value={Object.values(item)[0]}>{Object.values(item)[0]}</Option>
+              return <Option key={Object.keys(item)[0]} id={Object.keys(item)[0]} value={Object.values(item)[0]}>{Object.values(item)[0]}</Option>
+            
         });
 
         let companyOptions = company.map((item,index )=>{
@@ -457,23 +499,36 @@ export default class Retention extends React.Component{
              <Row>
                 <Col span="24">
                       <span style={{marginRight:5}}>年度:</span>
-                      <Select defaultValue="2018" style={{ width: 120,marginRight:30 }} onChange={handleChangeYear}>
+                      <Select defaultValue="2018" 
+                      style={{ width: 120,marginRight:30 }} 
+                      onChange={handleChangeYear}
+                      >
                         {yearOptions}
                         
                       </Select>
                    
                       <span style={{marginRight:5}}>区域:</span>
-                      <Select defaultValue={Object.values(area[0])} style={{ width: 120,marginRight:30 }} onChange={handleChangeArea}>
+                      <Select defaultValue={Object.values(area[0])} 
+                      style={{ width: 120,marginRight:30 }}
+                       onChange={handleChangeArea}
+                       >
                         {areaOptions}
                       </Select>
                  
                         <span style={{marginRight:5}}>分公司:</span>
-                        <Select defaultValue={Object.values(company[0])} style={{ width: 120,marginRight:30 }} onChange={handleChangeCompany}>
+                        <Select 
+                        defaultValue={Object.values(company[0])} 
+                        style={{ width: 120,marginRight:30 }} 
+                        onChange={handleChangeCompany}>
                           {companyOptions}
                       </Select>
                     
                       <span style={{marginRight:5}}>管家姓名:</span>
-                      <Select defaultValue={Object.values(person[0])} style={{ width: 120,marginRight:30 }} onChange={handleChangePerson}>
+                      <Select 
+                      defaultValue={Object.values(person[0])} 
+                      style={{ width: 120,marginRight:30 }} 
+                      onChange={handleChangePerson}
+                      >
                         {personOptions}
                        </Select>
                        <Button
@@ -486,36 +541,36 @@ export default class Retention extends React.Component{
              </Row>
              <hr />
                <Row style={{marginTop:10}}>
-                 <Col span="6">截止到目前（时点）</Col>
+                 <Col span="6">截止到目前:（时点）{new Date().toLocaleDateString()}</Col>
                </Row>
              <Row style={{marginTop:10}}>
                   <Col span="6">
                       <span>保有客户分公司最多的是:</span>
-                      <span>北京1</span>
+                      <span>{maxAndMin.rentention.max}</span>
                   </Col>
                    <Col span="5">
                       <span>最少的分公司是:</span>
-                      <span>北京2</span>
+                      <span>{maxAndMin.rentention.Min}</span>
                   </Col>
                </Row>
                 <Row style={{marginTop:10}}>
                   <Col span="6">
                       <span>当年累计新增客户最多的是:</span>
-                      <span>天津</span>
+                      <span>{maxAndMin.increase.max}</span>
                   </Col>
                    <Col span="5">
                       <span>最少的分公司是:</span>
-                      <span>北京2</span>
+                       <span>{maxAndMin.increase.Min}</span>
                   </Col>
                </Row>
                 <Row style={{marginTop:10}}>
                   <Col span="6">
                       <span>当年累计流失客户最多的是:</span>
-                      <span>石家庄</span>
+                      <span>{maxAndMin.decrease.max}</span>
                   </Col>
                    <Col span="5">
                       <span>最少的分公司是:</span>
-                      <span>北京2</span>
+                      <span>{maxAndMin.decrease.max}</span>
                   </Col>
                </Row>
                 

@@ -19,7 +19,7 @@ function getDomain(){
     }
 };
 
-let mockData = {//模拟的假数据
+let mockData = {//模拟的假数据 上线的时候删除
 	  //得到权限
       getRight : 'https://www.easy-mock.com/mock/59952ae9059b9c566dc18e2d/getData/getRight',
       //客户保有量
