@@ -33,7 +33,7 @@ class App extends Component {
     let mockInit = "https://www.easy-mock.com/mock/5aa8cb6eed660354c14569c0/getData_copy/initData";
 
     let that = this;
-    axios.get(getRight,{
+    axios.get(mockInit,{
       params: {
          areaId:75,//区域ID
          subId:169,//分司ID

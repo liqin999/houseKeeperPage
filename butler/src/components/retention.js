@@ -92,23 +92,23 @@ export default class Retention extends React.Component{
             yAxis: [{
                 type: 'value',
                 name: '保有',
-                min: 0,
-                max: 50,
+                //min: 0,
+               // max: 50,
                 position: 'right',
                 axisLabel: {
-                    formatter: '{value} 万'
+                    formatter: '{value} 千'
                 }
             }, {
                 type: 'value',
                 name: '新增',
-                min: -3000,
-                max: 3000,
+                //min: -3000,
+                //max: 3000,
                 position: 'left'
             },
             {
                 type: 'value',
-                min: -3000,
-                max: 3000,
+               // min: -3000,
+                //max: 3000,
                 position: 'left',
 
             }
@@ -329,9 +329,7 @@ export default class Retention extends React.Component{
       this.setState({
         mainCharts:this.refs.mainCharts
       },function(){//在setState的回调的函数里面写具体的请求数据
-        var myChart = echarts.init(this.state.mainCharts);
-        let rentionChartOption = this.state.retentionData.rentionChartOption;
-        myChart.setOption(rentionChartOption);
+       
      })
     }
 
@@ -340,27 +338,60 @@ export default class Retention extends React.Component{
     }
 
     componentWillReceiveProps(nextProps){
-      //AccessRight,props,allPageData
-      console.log(this.props.AccessRight);
-      console.log(this.props.allPageData);
-   
-     
+
       let AccessRight = nextProps.AccessRight;//变成内部的状态
       let retentionData = nextProps.allPageData;
 
+        var myChart = echarts.init(this.refs.mainCharts);
+        let char =retentionData.char;
 
-        this.setState(prevState => ({
+      var newcust = char.cust.slice(0);
+      var newadd = char.add.slice(0);
+      var newlost = char.lost.slice(0);
+      let resultcust = [];
+      let resultadd = [];
+      let resultlost = [];
+      newcust.forEach(function(item){
+        resultcust.push(Object.values(item).toString())
+      });
+       newadd.forEach(function(item){
+        resultadd.push(Object.values(item).toString())
+      });
+        newlost.forEach(function(item){
+        resultlost.push(Object.values(item).toString())
+      });
+
+        //将流失量变成负值
+        resultlost = resultlost.map((item)=>{
+          return -parseInt(item)
+        });
+
+        resultcust = resultcust.map((item,index)=>{
+          let ary = item.toString().split("");
+          let len = ary.length;
+          ary.splice(ary.length-3,0,".")
+          let str = ary.join("")
+          return str
+        })
+        //将从后台接受的echar的数据，改变成真实的数据
+        this.state.retentionData.rentionChartOption.series[1].data =resultadd;
+        this.state.retentionData.rentionChartOption.series[0].data =resultcust;
+        this.state.retentionData.rentionChartOption.series[2].data =resultlost;
+
+        let rentionChartOption = this.state.retentionData.rentionChartOption;
+        myChart.setOption(rentionChartOption);
+
+
+        this.setState({
            AccessRight,
            retentionData,
-        }));
-
-
-  
-     
+        }, () => {
+          
+        })
     }
 
     handleChangeYear(value){//年份的改变
-        console.log(value);
+       
         this.setState({
           year:value
         })
@@ -423,10 +454,10 @@ export default class Retention extends React.Component{
             },
 
             }
-            // retentionData['company'] = response.data.select;
+           
              
           })
-          console.log(response);
+          
 
         })
         .catch(function (error) {
@@ -459,11 +490,11 @@ export default class Retention extends React.Component{
         this.handleChangeValue(value,'person',id);
     }
      render(){
-      let retentionData = this.state.regionData;
-
-      
+      //render的时候可以直接从父组件的的props取值，父子组价之间的值的传递
+      let retentionData = this.props.allPageData;
+      //直接从props中取值，然后在render中使用。看源码。追本溯源
       let maxAndMin = this.state.retentionData.maxAndMin;//对象的结构赋值
-      console.log(this.state)
+      
 
       let {handleChangeYear,handleChangeArea,handleChangeCompany,handleChangePerson,handleSearchData}=this;
       let area = this.state.retentionData.area;
@@ -576,7 +607,10 @@ export default class Retention extends React.Component{
                 
                 <div style={{marginTop:20}}>
                   <h2 style={{textAlign: "center"}}>客户保有量</h2>
-                   <div id="mainCharts" ref="mainCharts" style={{width: 1000,height:400}}></div> 
+                   <div id="mainCharts" 
+                   ref="mainCharts" 
+                   style={{width: 1000,height:400}}
+                   ></div> 
                 </div>
                 
                 <hr />
